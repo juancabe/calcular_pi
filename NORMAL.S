@@ -1,6 +1,6 @@
 .data
 wIteraciones:    .word 7       
-; Limitado a 7 para evitar desbordamiento
+; Limitado a 7 para evitar desbordamiento // TODO Ver esto
 const16punto0:   .float 16.0   
 ; Constante 16.0 en formato flotante
 potencias16:     .space 40     
