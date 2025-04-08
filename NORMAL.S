@@ -4,33 +4,19 @@ wIteraciones:    .word 7
 const16punto0:   .float 16.0   
 ; Constante 16.0 en formato flotante
 potencias16:     .space 40     
-; Espacio para potencias16[k]
 calculoA:        .space 40     
-; Espacio para calculoA[k]
 kpor8:           .space 40     
-; Espacio para kpor8[k]
 kpor8mas1:       .space 40     
-; Espacio para kpor8mas1[k]
 kpor8mas4:       .space 40     
-; Espacio para kpor8mas4[k]
 kpor8mas5:       .space 40     
-; Espacio para kpor8mas5[k]
 kpor8mas6:       .space 40     
-; Espacio para kpor8mas6[k]
 calculoB:        .space 40     
-; Espacio para calculoB[k]
 calculoC:        .space 40     
-; Espacio para calculoC[k]
 calculoD:        .space 40     
-; Espacio para calculoD[k]
 calculoE:        .space 40     
-; Espacio para calculoE[k]
 calculoBCDE:     .space 40     
-; Espacio para calculoBCDE[k]
 calculoITE:      .space 40     
-; Espacio para calculoITE[k]
 calculoPI:       .space 40     
-; Espacio para calculoPI[k]
 
 .text
 .global main
@@ -39,35 +25,30 @@ main:
     
 ; Cargar constantes en registros
     addi r1, r0, 1       
-; r1 = 1
     addi r2, r0, 2       
-; r2 = 2
     addi r3, r0, 4       
-; r3 = 4
     addi r4, r0, 8       
-; r4 = 8
     addi r5, r0, 16      
-; r5 = 16
     
     
 ; Convertir constantes enteras a punto flotante
     movi2fp f1, r1
+    ; f1 = 1.0
     cvti2f f1, f1        
-; f1 = 1.0
     movi2fp f2, r2
+    ; f2 = 2.0
     cvti2f f2, f2        
-; f2 = 2.0
     movi2fp f3, r3
+    ; f3 = 4.0
     cvti2f f3, f3        
-; f3 = 4.0
-    
-    lf f4, const16punto0 
+
+
 ; Cargar constante 16.0 en punto flotante
+    lf f4, const16punto0 
     
     
 ; Cargar wIteraciones
     lw r10, wIteraciones  
-; r10 = wIteraciones
     
     
 ; Comprobar si wIteraciones es 0, si es así salimos
@@ -76,43 +57,42 @@ main:
     
 ; Inicializar k y pi
     addi r11, r0, 0       
-; r11 = k = 0
+    ; f31 = pi = 0.0
     addf f31, f0, f0      
-; f31 = pi = 0.0
     
 loop:
     
 ; Comprobar si hemos hecho todas las iteraciones
+    ; r20 = (k < wIteraciones)
     slt r20, r11, r10     
-; r20 = (k < wIteraciones)
+    ; si no (k < wIteraciones), salir
     beqz r20, exit        
-; si no (k < wIteraciones), salir
     
     
 ; Calcular desplazamientos de memoria para arrays (k*4)
+    ; r21 = k*4
     slli r21, r11, 2      
-; r21 = k*4
     
     
 ; a. Calcular 16^k usando punto flotante directamente
+    ; si k=0, potencia = 1
     beqz r11, potencia_zero  
-; si k=0, potencia = 1
     
     
 ; Para k > 0, calculamos usando punto flotante para evitar desbordamiento
+    ; r22 = (k-1)*4
     subi r22, r21, 4          
-; r22 = (k-1)*4
+    ; f5 = potencias16[k-1] (en flotante)
     lf f5, potencias16(r22)   
-; f5 = potencias16[k-1] (en flotante)
+    ; f6 = potencias16[k-1] * 16.0
     multf f6, f5, f4          
-; f6 = potencias16[k-1] * 16.0
+    ; potencias16[k] = f6
     sf potencias16(r21), f6   
-; potencias16[k] = f6
     j potencia_done
     
 potencia_zero:
+    ; potencias16[0] = 1.0
     sf potencias16(r21), f1   
-; potencias16[0] = 1.0
     
 potencia_done:
     
