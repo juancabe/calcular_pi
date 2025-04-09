@@ -10,34 +10,33 @@ const4_0:        .float  4.0
 const16_0:       .float  16.0
 
 ; --- Arrays para almacenar resultados (Espacio para 5 elementos de 32 bits = 20 bytes) ---
-; --- Modificado a 40 bytes por si wIteraciones es mayor, aunque limitado por overflow ---
-potencias16:     .space 40     
+potencias16:     .space 5*4     
 ; Salida: 16^k (float para precisión/rango)
-calculoA:        .space 40     
+calculoA:        .space 5*4     
 ; Salida: 1 / 16^k
-kpor8:           .space 40     
+kpor8:           .space 5*4     
 ; Salida: 8*k (entero)
-kpor8mas1:       .space 40     
+kpor8mas1:       .space 5*4     
 ; Salida: 8*k+1 (entero)
-kpor8mas4:       .space 40     
+kpor8mas4:       .space 5*4     
 ; Salida: 8*k+4 (entero)
-kpor8mas5:       .space 40     
+kpor8mas5:       .space 5*4     
 ; Salida: 8*k+5 (entero)
-kpor8mas6:       .space 40     
+kpor8mas6:       .space 5*4     
 ; Salida: 8*k+6 (entero)
-calculoB:        .space 40     
+calculoB:        .space 5*4     
 ; Salida: 4/(8k+1)
-calculoC:        .space 40     
+calculoC:        .space 5*4     
 ; Salida: 2/(8k+4)
-calculoD:        .space 40     
+calculoD:        .space 5*4     
 ; Salida: 1/(8k+5)
-calculoE:        .space 40     
+calculoE:        .space 5*4     
 ; Salida: 1/(8k+6)
-calculoBCDE:     .space 40     
+calculoBCDE:     .space 5*4     
 ; Salida: B - C - D - E
-calculoITE:      .space 40     
+calculoITE:      .space 5*4     
 ; Salida: (1/16^k) * BCDE
-calculoPI:       .space 40     
+calculoPI:       .space 5*4     
 ; Salida: Valor acumulado de PI para la iteración k
 
 ; --- Plan de Asignación de Registros (Parcial) ---

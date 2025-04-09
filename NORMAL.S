@@ -3,20 +3,20 @@ wIteraciones:    .word 5
 ; Limitado a 7 para evitar desbordamiento // TODO Ver esto
 const16punto0:   .float 16.0
 ; Constante 16.0 en formato flotante
-potencias16:     .space 40
-calculoA:        .space 40
-kpor8:           .space 40
-kpor8mas1:       .space 40
-kpor8mas4:       .space 40
-kpor8mas5:       .space 40
-kpor8mas6:       .space 40
-calculoB:        .space 40
-calculoC:        .space 40
-calculoD:        .space 40
-calculoE:        .space 40
-calculoBCDE:     .space 40
-calculoITE:      .space 40
-calculoPI:       .space 40
+potencias16:     .space 5*4
+calculoA:        .space 5*4
+kpor8:           .space 5*4
+kpor8mas1:       .space 5*4
+kpor8mas4:       .space 5*4
+kpor8mas5:       .space 5*4
+kpor8mas6:       .space 5*4
+calculoB:        .space 5*4
+calculoC:        .space 5*4
+calculoD:        .space 5*4
+calculoE:        .space 5*4
+calculoBCDE:     .space 5*4
+calculoITE:      .space 5*4
+calculoPI:       .space 5*4
 
 .text
 .global main
