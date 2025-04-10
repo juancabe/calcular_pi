@@ -105,6 +105,10 @@ calculoPI:       .space 5*4
 .global main
 
 main:
+
+    lw r10, wIteraciones        ; Cargar número de iteraciones en r10
+    beqz r10, exit              ; Si iteraciones 0, saltar al final
+
     addi r1, r0, 1              ; Cargar 1 en r1
     addi r2, r0, 2              ; Cargar 2 en r2
     addi r3, r0, 4              ; Cargar 4 en r3
@@ -115,8 +119,6 @@ main:
     lf f3, const4_0             ; Cargar 4.0 en f3
     lf f4, const16_0            ; Cargar 16.0 en f4
 
-    lw r10, wIteraciones        ; Cargar número de iteraciones en r10
-    beqz r10, exit              ; Si iteraciones 0, saltar al final
 
     add r11, r0, r0             ; Inicializar k = 0
     addf f31, f0, f0            ; Inicializar pi = 0.0
@@ -125,6 +127,12 @@ main:
     addi r5, r0, 1              ; Inicializar acumulador de 16^k = 1 (entero)
     slli r6, r1, 4              ; Calcular constante entera 16: 1 << 4 = 16
 
+    ; --- Vamos calculando divisiones ---
+    movi2fp f20, r5             ; f20 = entero 16^k
+    cvti2f f20, f20             ; f20 = float(16^k)
+    
+    divf f9, f1, f20                ; f9 = 1.0 / (16^k)                     <-- Vamos calculando divisiones
+    ; --- Vamos calculando divisiones ---
 
     slli r25, r11, 3           ; r25 = k * 8
     addi r26, r25, 1            ; r26 = 8*k + 1
@@ -132,61 +140,64 @@ main:
     addi r28, r25, 5            ; r28 = 8*k + 5
     addi r29, r25, 6            ; r29 = 8*k + 6
 
+    
+
 ; --- Inicio del bucle principal ---
 loop:
-
-    
-
-    movi2fp f20, r5             ; f20 = entero 16^k
-    cvti2f f20, f20             ; f20 = float(16^k)
-    
-    divf f9, f1, f20                ; f9 = 1.0 / (16^k)                     <-- Vamos calculando divisiones
 
     movi2fp f5, r26             ; Convertir 8*k+1 a flotante
     cvti2f f5, f5               ; f5 = float(8*k+1)
     movi2fp f6, r27             ; Convertir 8*k+4 a flotante
     cvti2f f6, f6               ; f6 = float(8*k+4)
     movi2fp f7, r28             ; Convertir 8*k+5 a flotante
+
+    divf f10, f3, f5                ; f10 = 4.0 / (8*k+1)                   <-- Vamos calculando divisiones         0.
+    
     cvti2f f7, f7               ; f7 = float(8*k+5)
     movi2fp f8, r29             ; Convertir 8*k+6 a flotante
-    
-    divf f10, f3, f5                ; f10 = 4.0 / (8*k+1)                   <-- Vamos calculando divisiones         0.
-
     cvti2f f8, f8               ; f8 = float(8*k+6)
     slli r5, r5, 4              ; Actualizar 16^k: r5 = r5 * 16 (para (k+1))
     addi r11, r11, 1            ; Incrementar k
     addi r13, r13, 4            ; Actualizar desplazamiento para el siguiente elemento
     slli r25, r11, 3                ; r25 = k * 8                                        <-- Formar siguientes BCDE
-    sw kpor8mas1-4(r13), r26    ; Almacenar 8*k+1 en kpor8mas1[k]
-    addi r26, r25, 1                ; r26 = 8*k + 1                                 <-- Formar siguientes BCDE
 
     divf f11, f2, f6                ; f11 = 2.0 / (8*k+4)                   <-- Vamos calculando divisiones         1.
-
+    
+    sw kpor8mas1-4(r13), r26    ; Almacenar 8*k+1 en kpor8mas1[k]
+    addi r26, r25, 1                ; r26 = 8*k + 1                                 <-- Formar siguientes BCDE
     sw kpor8-4(r13), r25        ; Almacenar 8*k en kpor8[k]
     sw kpor8mas4-4(r13), r27    ; Almacenar 8*k+4 en kpor8mas4[k]
     addi r27, r25, 4                ; r27 = 8*k + 4                                 <-- Formar siguientes BCDE
     sw kpor8mas5-4(r13), r28    ; Almacenar 8*k+5 en kpor8mas5[k]
     addi r28, r25, 5                ; r28 = 8*k + 5                                 <-- Formar siguientes BCDE
-    sw kpor8mas6-4(r13), r29    ; Almacenar 8*k+6 en kpor8mas6[k]
-    addi r29, r25, 6                ; r29 = 8*k + 6                                 <-- Formar siguientes BCDE
-    
+
     divf f12, f1, f7            ; f12 = 1.0 / (8*k+5)                       <-- Vamos calculando divisiones         2.
     
+    sw kpor8mas6-4(r13), r29    ; Almacenar 8*k+6 en kpor8mas6[k]
+    addi r29, r25, 6                ; r29 = 8*k + 6                                 <-- Formar siguientes BCDE
     sw potencias16-4(r13), r5   ; Almacenar 16^k (entero) en potencias16[k]
     slt r20, r11, r10           ; r20 = 1 si k < iteraciones, 0 en otro caso                <-- Generar condicion de salto
     sf calculoA-4(r13), f9      ; Almacenar calculoA[k]
     subf f14, f10, f11              ; f14 = B - C                       <-- Calcular BCDE Actual                    1.1.
     sf calculoB-4(r13), f10     ; Almacenar calculoB[k]
-    sf calculoC-4(r13), f11     ; Almacenar calculoC[k]
-    sf calculoD-4(r13), f12     ; Almacenar calculoD[k]
 
     divf f13, f1, f8                ; f13 = 1.0 / (8*k+6)                   <-- Vamos calculando divisiones         3.
     
+    sf calculoC-4(r13), f11     ; Almacenar calculoC[k]
+    sf calculoD-4(r13), f12     ; Almacenar calculoD[k]
     subf f14, f14, f12              ; f14 = (B - C) - D                 <-- Calcular BCDE Actual                    2.2
-    sf calculoE-4(r13), f13     ; Almacenar calculoE[k]
     subf f14, f14, f13              ; f14 = (B - C - D) - E             <-- Calcular BCDE Actual                    3.3
+    sf calculoE-4(r13), f13     ; Almacenar calculoE[k]
     sf calculoBCDE-4(r13), f14  ; Almacenar calculoBCDE[k]
     multf f15, f9, f14              ; f15 = (1/16^k) * BCDE             <-- Calcular ITE Actual (a partir de BCDE)  4.
+
+    ; --- Vamos calculando divisiones ---
+    movi2fp f20, r5             ; f20 = entero 16^k
+    cvti2f f20, f20             ; f20 = float(16^k)
+    
+    divf f9, f1, f20                ; f9 = 1.0 / (16^k)                     <-- Vamos calculando divisiones
+    ; --- Vamos calculando divisiones ---
+
     addf f31, f31, f15              ; pi += aprox
     sf calculoITE-4(r13), f15   ; Almacenar calculoITE[k]
     sf calculoPI-4(r13), f31    ; Almacenar calculoPI[k]
