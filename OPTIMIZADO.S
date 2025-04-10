@@ -105,6 +105,8 @@ calculoPI:       .space 5*4
 .global main
 
 main:
+    addi r5, r0, 1              ; Inicializar acumulador de 16^k = 1 (entero)
+    movi2fp f20, r5             ; f20 = entero 16^k
 
     lw r10, wIteraciones        ; Cargar número de iteraciones en r10
     beqz r10, exit              ; Si iteraciones 0, saltar al final
@@ -114,11 +116,9 @@ main:
     lf f3, const4_0             ; Cargar 4.0 en f3
     lf f4, const16_0            ; Cargar 16.0 en f4
 
-    addi r5, r0, 1              ; Inicializar acumulador de 16^k = 1 (entero)
     slli r6, r1, 4              ; Calcular constante entera 16: 1 << 4 = 16
 
     ; --- Vamos calculando divisiones ---
-    movi2fp f20, r5             ; f20 = entero 16^k
     cvti2f f20, f20             ; f20 = float(16^k)
     
     divf f9, f1, f20                ; f9 = 1.0 / (16^k)                     <-- Vamos calculando divisiones
@@ -177,14 +177,14 @@ loop:
     addi r29, r25, 6                ; r29 = 8*k + 6                                 <-- Formar siguientes BCDE
     sw potencias16-4(r13), r5   ; Almacenar 16^k (entero) en potencias16[k]
     sf calculoA-4(r13), f9      ; Almacenar calculoA[k]
-    subf f14, f10, f11              ; f14 = B - C                       <-- Calcular BCDE Actual                    1.1.
-    sf calculoB-4(r13), f10     ; Almacenar calculoB[k]
 
     divf f13, f1, f8                ; f13 = 1.0 / (8*k+6)                   <-- Vamos calculando divisiones         3.
     
+    sf calculoB-4(r13), f10     ; Almacenar calculoB[k]
+    subf f14, f10, f11              ; f14 = B - C                       <-- Calcular BCDE Actual                    1.1.
     sf calculoC-4(r13), f11     ; Almacenar calculoC[k]
-    sf calculoD-4(r13), f12     ; Almacenar calculoD[k]
     subf f14, f14, f12              ; f14 = (B - C) - D                 <-- Calcular BCDE Actual                    2.2
+    sf calculoD-4(r13), f12     ; Almacenar calculoD[k]
     subf f14, f14, f13              ; f14 = (B - C - D) - E             <-- Calcular BCDE Actual                    3.3
     multf f15, f9, f14              ; f15 = (1/16^k) * BCDE             <-- Calcular ITE Actual (a partir de BCDE)  4.
     ; --- Vamos calculando divisiones ---
@@ -193,11 +193,9 @@ loop:
     
     divf f9, f1, f20                ; f9 = 1.0 / (16^k)                     <-- Vamos calculando divisiones
     ; --- Vamos calculando divisiones ---
+    addf f31, f31, f15              ; pi += aprox
     sf calculoE-4(r13), f13     ; Almacenar calculoE[k]
     sf calculoBCDE-4(r13), f14  ; Almacenar calculoBCDE[k]
-
-
-    addf f31, f31, f15              ; pi += aprox
     sf calculoITE-4(r13), f15   ; Almacenar calculoITE[k]
     sf calculoPI-4(r13), f31    ; Almacenar calculoPI[k]
     bnez r20, loop              ; Si ya no hay iteraciones, salir                           <-- Saltar si hay que iterar
