@@ -139,6 +139,7 @@ loop:
     cvti2f f7, f7               ; f7 = float(8*k+5)
     movi2fp f8, r29             ; Convertir 8*k+6 a flotante
     cvti2f f8, f8               ; f8 = float(8*k+6)
+    sw potencias16(r13), r5   ; Almacenar 16^k (entero) en potencias16[k]
     slli r5, r5, 4              ; Actualizar 16^k: r5 = r5 * 16 (para (k+1))
     addi r11, r11, 1            ; Incrementar k
 
@@ -159,7 +160,6 @@ loop:
     addi r28, r25, 5                ; r28 = 8*k + 5                                 <-- Formar siguientes BCDE
     sw kpor8mas6-4(r13), r29    ; Almacenar 8*k+6 en kpor8mas6[k]
     addi r29, r25, 6                ; r29 = 8*k + 6                                 <-- Formar siguientes BCDE
-    sw potencias16-4(r13), r5   ; Almacenar 16^k (entero) en potencias16[k]
     sf calculoA-4(r13), f9      ; Almacenar calculoA[k]
 
     divf f13, f1, f8                ; f13 = 1.0 / (8*k+6)                   <-- Vamos calculando divisiones         3.
