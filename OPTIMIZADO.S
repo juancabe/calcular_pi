@@ -1,45 +1,29 @@
 .data
-; --- Variables de Entrada y Salida (No modificar orden) ---
-; Numero de iteraciones a realizar (0 a 4)
-wIteraciones:    .word   4       
+;; INICIO VARIABLES DE ENTRADA Y SALIDA: NO MODIFICAR ORDEN
+;; VARIABLE DE ENTRADA:
+wIteraciones:    .word   5
+;; VARIABLES DE SALIDA:
+potencias16:     .space 5*4
+kpor8:           .space 5*4      
+kpor8mas1:       .space 5*4      
+kpor8mas4:       .space 5*4      
+kpor8mas5:       .space 5*4      
+kpor8mas6:       .space 5*4
+calculoA:        .space 5*4      
+calculoB:        .space 5*4      
+calculoC:        .space 5*4      
+calculoD:        .space 5*4      
+calculoE:        .space 5*4      
+calculoBCDE:     .space 5*4      
+calculoITE:      .space 5*4      
+calculoPI:       .space 5*4
+
 
 ; --- Constantes en Punto Flotante ---
-
 const1_0:        .float  1.0     
 const2_0:        .float  2.0     
 const4_0:        .float  4.0     
-const16_0:       .float  16.0    
-
-; --- Arrays para almacenar resultados (5 elementos de 32 bits) ---
-
-; 16^k 
-potencias16:     .space 5*4      
-; 1 / 16^k
-calculoA:        .space 5*4      
-; 8*k (entero)
-kpor8:           .space 5*4      
-; 8*k+1 (entero)
-kpor8mas1:       .space 5*4      
-; 8*k+4 (entero)
-kpor8mas4:       .space 5*4      
-; 8*k+5 (entero)
-kpor8mas5:       .space 5*4      
-; 8*k+6 (entero)
-kpor8mas6:       .space 5*4      
-; 4/(8k+1)
-calculoB:        .space 5*4      
-; 2/(8k+4)
-calculoC:        .space 5*4      
-; 1/(8k+5)
-calculoD:        .space 5*4      
-; 1/(8k+6)
-calculoE:        .space 5*4      
-; B - C - D - E
-calculoBCDE:     .space 5*4      
-; (1/16^k) * BCDE
-calculoITE:      .space 5*4      
-; Valor acumulado de PI
-calculoPI:       .space 5*4      
+const16_0:       .float  16.0   
 
 ; --- Plan de Asignación de Registros (Actualizado) --- 
 ; Registros de propósito general: 
@@ -133,7 +117,7 @@ main:
     addf f31, f0, f0            ; Inicializar pi = 0.0
     add r13, r0, r0             ; Inicializar desplazamiento = 0
 
-    slli r25, r11, 3           ; r25 = k * 8
+    slli r25, r11, 3            ; r25 = k * 8
     addi r26, r25, 1            ; r26 = 8*k + 1
     addi r27, r25, 4            ; r27 = 8*k + 4
     addi r28, r25, 5            ; r28 = 8*k + 5
@@ -161,10 +145,10 @@ loop:
     divf f11, f2, f6                ; f11 = 2.0 / (8*k+4)                   <-- Vamos calculando divisiones         1.
     
     addi r13, r13, 4            ; Actualizar desplazamiento para el siguiente elemento
+    sw kpor8-4(r13), r25        ; Almacenar 8*k en kpor8[k]
     slli r25, r11, 3                ; r25 = k * 8                                        <-- Formar siguientes BCDE
     sw kpor8mas1-4(r13), r26    ; Almacenar 8*k+1 en kpor8mas1[k]
     addi r26, r25, 1                ; r26 = 8*k + 1                                 <-- Formar siguientes BCDE
-    sw kpor8-4(r13), r25        ; Almacenar 8*k en kpor8[k]
     sw kpor8mas4-4(r13), r27    ; Almacenar 8*k+4 en kpor8mas4[k]
     addi r27, r25, 4                ; r27 = 8*k + 4                                 <-- Formar siguientes BCDE
 

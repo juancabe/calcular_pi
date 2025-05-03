@@ -1,14 +1,15 @@
 .data
+;; INICIO VARIABLES DE ENTRADA Y SALIDA: NO MODIFICAR ORDEN
+;; VARIABLE DE ENTRADA: 
 wIteraciones:    .word 5
-const16punto0:   .float 16.0
-; Constante 16.0 en formato flotante
+;; VARIABLES DE SALIDA:
 potencias16:     .space 5*4
-calculoA:        .space 5*4
 kpor8:           .space 5*4
 kpor8mas1:       .space 5*4
 kpor8mas4:       .space 5*4
 kpor8mas5:       .space 5*4
 kpor8mas6:       .space 5*4
+calculoA:        .space 5*4
 calculoB:        .space 5*4
 calculoC:        .space 5*4
 calculoD:        .space 5*4
@@ -16,6 +17,8 @@ calculoE:        .space 5*4
 calculoBCDE:     .space 5*4
 calculoITE:      .space 5*4
 calculoPI:       .space 5*4
+
+const16punto0:   .float 16.0
 
 .text
 .global main
